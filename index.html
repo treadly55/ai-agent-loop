@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekend Away - Sydney Events</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
+        .container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 600px; margin: auto;}
+        h1, h2 { color: #333; text-align: center; }
+        p { text-align: center; margin-bottom: 20px;}
+        .timeframe-buttons { display: flex; justify-content: space-around; margin-bottom: 20px; }
+        .timeframe-buttons button {
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid #007bff;
+            background-color: #e7f3ff;
+            color: #0056b3;
+            cursor: pointer;
+            font-size: 14px;
+            flex-grow: 1; /* Make buttons take up space */
+            margin: 0 5px; /* Add space between buttons */
+            transition: background-color 0.2s ease;
+        }
+        .timeframe-buttons button:hover { background-color: #cce5ff; }
+        .timeframe-buttons button:disabled { background-color: #ddd; color: #888; border-color: #ccc; cursor: not-allowed;}
+        #results-area { margin-top: 20px; padding: 15px; background-color: #e9ecef; border-radius: 4px; min-height: 50px;}
+        #results-area h2 { margin-top: 0; text-align: left;}
+        #results-area p, #results-area ul {text-align: left;}
+        #results-area ul { padding-left: 20px; }
+        #results-area li { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weekend Away</h1>
+        <p>Finding exciting events happening in <strong>Sydney</strong>!</p>
+
+        <h2>When are you interested in?</h2>
+        <div class="timeframe-buttons">
+            <button id="btn-today" data-timeframe-key="today">Today</button>
+            <button id="btn-tomorrow" data-timeframe-key="tomorrow">Tomorrow</button>
+            <button id="btn-week" data-timeframe-key="week">This Week</button>
+        </div>
+
+        <div id="results-area">
+            <p>Choose a timeframe above to find events.</p>
+        </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>

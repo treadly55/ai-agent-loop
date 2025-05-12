@@ -1,0 +1,22 @@
+# netlify.toml
+
+[build]
+  # Command to build your Vite project (adjust if needed)
+  command = "npm run build"
+  # Directory containing the build output (usually 'dist' for Vite)
+  publish = "dist"
+  # Directory where your serverless functions live
+  functions = "netlify/functions"
+
+# Optional: Redirect rule to make the function URL cleaner (e.g., /api/events)
+# [[redirects]]
+#  from = "/api/events"
+#  to = "/.netlify/functions/get-events"
+#  status = 200
+
+# Optional: For local development with 'netlify dev'
+# You can specify environment variables here, but UI is better for production
+# [dev]
+#  command = "npm run dev" # Command to start your Vite dev server
+#  port = 5173 # Port your Vite dev server runs on (adjust if needed)
+#  targetPort = 3000 # Port the Netlify CLI serves on
