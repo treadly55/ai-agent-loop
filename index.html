@@ -33,11 +33,58 @@
         }
         .timeframe-buttons button:hover { background-color: #cce5ff; }
         .timeframe-buttons button:disabled { background-color: #ddd; color: #888; border-color: #ccc; cursor: not-allowed;}
-        #results-area { margin-top: 20px; padding: 15px; background-color: #e9ecef; border-radius: 4px; min-height: 50px;}
+        
+        /* Default style for results area */
+        #results-area {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            min-height: 50px; /* Keep a minimum height */
+            transition: max-height 0.3s ease-out; /* Smooth transition for height changes */
+        }
+        /* Style for results area when loading progress messages */
+        #results-area.results-area-loading {
+            max-height: 100px; /* Adjust this fixed height as needed for 3-5 lines of progress */
+            overflow: hidden; /* Hide older messages that overflow */
+            display: flex; /* Use flexbox to align items at the bottom */
+            flex-direction: column; /* Stack items vertically */
+            justify-content: flex-end; /* Align new items to the bottom */
+        }
+        #results-area.results-area-loading ul {
+            list-style-position: inside; /* Ensure bullets are within the flow */
+        }
+
         #results-area h2 { margin-top: 0; text-align: left;}
         #results-area p, #results-area ul {text-align: left;}
-        #results-area ul { padding-left: 20px; }
+        #results-area ul { padding-left: 0px; margin-bottom: 0; } /* Adjusted padding for loading state */
         #results-area li { margin-bottom: 5px; }
+
+        .hidden { display: none; }
+        #retry-section {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+        }
+        #retry-section p {
+            font-style: italic;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        #retry-section button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        #retry-section button:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
@@ -49,11 +96,11 @@
             <label for="city-select">Choose a city:</label>
             <select name="cities" id="city-select">
                 <option value="">--Please choose a city--</option>
-                <option value="Sydney, New South Wales, Australia">Sydney</option>
-                <option value="Melbourne, Victoria, Australia">Melbourne</option>
-                <option value="Brisbane, Queensland, Australia">Brisbane</option>
-                <option value="Perth, Western Australia, Australia">Perth</option>
-                <option value="Adelaide, South Australia, Australia">Adelaide</option>
+                <option value="Sydney, AU">Sydney</option>
+                <option value="Melbourne, AU">Melbourne</option>
+                <option value="Brisbane, AU">Brisbane</option>
+                <option value="Perth, AU">Perth</option>
+                <option value="Adelaide, AU">Adelaide</option>
             </select>
         </div>
 
@@ -61,10 +108,15 @@
         <div class="timeframe-buttons">
             <button id="btn-today" data-timeframe-key="today">Today</button>
             <button id="btn-tomorrow" data-timeframe-key="tomorrow">Tomorrow</button>
-            </div>
+        </div>
 
         <div id="results-area">
             <p>Choose a city and timeframe above to find events.</p>
+        </div>
+
+        <div id="retry-section" class="hidden">
+            <p>Didn't find any events you like?</p>
+            <button id="btn-retry">Try again</button>
         </div>
     </div>
 
