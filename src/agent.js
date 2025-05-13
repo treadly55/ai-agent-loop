@@ -58,12 +58,19 @@ Interaction Flow Example:
 8. PAUSE
 9. Observation: (Weather data from getWeather tool)
 10. Thought: Now I will analyze events and weather to pick the top 2 most exciting and weather-appropriate.
-11. Final Output: (Formatted HTML recommendations for Melbourne, incorporating weather)
+11. Final Output: (Formatted HTML recommendations, incorporating weather)
 
-Example of the ONLY valid format for your final response message:
-For Melbourne, with clear skies expected on 2025-05-13, here are two exciting event ideas:
-* <a href="http://example.com/kayak-race" target="_blank" rel="noopener noreferrer">Kayak Adventure Race</a>: Perfect for a clear day, this offers a 'fun and challenging race around the harbour'!
-* <a href="http://example.com/food-rally" target="_blank" rel="noopener noreferrer">Gourmet Food Truck Rally</a>: Enjoy unique dishes outdoors with 'Live music too!' under the sunny sky.
+Example of the ONLY valid format for your final response message per event:
+---
+<p>In honor of our lord, here are the best </p>
+<p>For <chosen city>, with clear skies expected on <humanised date>, here are two exciting event ideas:</p>
+<br />
+<h3><title of event></h3>
+<p><description of event></p>
+<br />
+<a href="http://example.com/kayak-race" target="_blank" rel="noopener noreferrer">Book now</a>
+<br />
+---
 `;
 // --- End Updated System Prompt ---
 

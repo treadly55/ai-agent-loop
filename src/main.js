@@ -1,7 +1,5 @@
-// src/main.js
-
-import '/style.css'; 
 import { runWeekendAgent } from './agent.js';
+import '/style.css'; 
 
 const EVENT_API_KEY_FOR_TODAY = "date:today";
 const EVENT_API_KEY_FOR_TOMORROW = "date:tomorrow";
@@ -17,18 +15,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const citySelect = document.getElementById('city-select');
     const timeframeButtons = document.querySelectorAll('.timeframe-buttons button');
     const resultsArea = document.getElementById('results-area');
+    const initialPromptMessage = document.getElementById('initial-prompt-message'); // Get reference
     const retrySection = document.getElementById('retry-section');
     const retryButton = document.getElementById('btn-retry');
 
-    const initialResultsMessage = '<p>Choose a city and timeframe above to find events.</p>';
     let isAgentRunning = false;
 
     function resetUIForNewSearch() {
-        resultsArea.innerHTML = initialResultsMessage;
-        resultsArea.classList.remove('results-area-loading'); // Remove loading class
+        resultsArea.innerHTML = ''; // Clear all dynamic content (like progress <ul> or results)
+        if (initialPromptMessage) {
+            initialPromptMessage.style.display = 'block'; // Show initial prompt
+            resultsArea.appendChild(initialPromptMessage); // Ensure it's back if innerHTML was cleared
+        }
+        resultsArea.classList.remove('results-area-loading');
         retrySection.classList.add('hidden');
         citySelect.disabled = false;
-        citySelect.value = ""; // Reset city dropdown
+        citySelect.value = ""; 
         timeframeButtons.forEach(btn => btn.disabled = false);
     }
 
@@ -40,8 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const selectedCityValue = citySelect.value;
         if (!selectedCityValue) {
-            resultsArea.innerHTML = '<p style="color: red;">Please select a city first.</p>';
-            resultsArea.classList.remove('results-area-loading'); // Ensure loading class is off
+            resultsArea.innerHTML = '<p style="color: red;">Please select a city first.</p>'; // Keep error message simple
+            if (initialPromptMessage) initialPromptMessage.style.display = 'none'; // Hide prompt if error shown
+            resultsArea.classList.remove('results-area-loading');
             retrySection.classList.add('hidden');
             return;
         }
@@ -68,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             default:
                 console.error("Unknown timeframe key:", eventApiKeyStringInternal);
                 resultsArea.innerHTML = '<p style="color: red;">Invalid timeframe selected.</p>';
+                if (initialPromptMessage) initialPromptMessage.style.display = 'none';
                 resultsArea.classList.remove('results-area-loading');
                 retrySection.classList.add('hidden');
                 return;
@@ -79,18 +83,17 @@ document.addEventListener('DOMContentLoaded', () => {
         timeframeButtons.forEach(btn => btn.disabled = true);
         citySelect.disabled = true;
         
-        // Add loading class and set initial message for progress
+        if (initialPromptMessage) initialPromptMessage.style.display = 'none'; // Hide initial prompt
         resultsArea.classList.add('results-area-loading');
-        resultsArea.innerHTML = `<ul><li>Looking for exciting events in ${selectedCityDisplay} for '${timeframeDescription}'...</li></ul>`; // Start with ul for consistent styling
+        // Initialize resultsArea with an empty ul for progress, or a starting message
+        resultsArea.innerHTML = `<ul><li>Looking for exciting events in ${selectedCityDisplay} for '${timeframeDescription}'...</li></ul>`;
         
         retrySection.classList.add('hidden');
-        let progressLog = [`<li>Looking for exciting events in ${selectedCityDisplay} for '${timeframeDescription}'...</li>`]; // Keep track of log items
+        let progressLog = [`<li>Looking for exciting events in ${selectedCityDisplay} for '${timeframeDescription}'...</li>`];
 
         function updateProgress(message) {
             console.log('[Progress]', message);
             progressLog.push(`<li>${message}</li>`);
-            // Update the content of the resultsArea, which is now fixed height and overflow hidden
-            // The flexbox properties will keep the latest messages at the bottom
             resultsArea.innerHTML = `<ul>${progressLog.join('')}</ul>`;
         }
 
@@ -106,20 +109,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateProgress
             );
             
-            resultsArea.classList.remove('results-area-loading'); // Remove loading class to allow expansion
+            resultsArea.classList.remove('results-area-loading'); 
+            // The initial-prompt-message is already hidden. Now we overwrite innerHTML.
             resultsArea.innerHTML = `<h2>Top Event Suggestions for ${selectedCityDisplay} (${timeframeDescription})</h2><p>${recommendations.replace(/\n/g, '<br>')}</p>`;
             console.log("Final Recommendations:", recommendations);
             retrySection.classList.remove('hidden');
 
         } catch (error) {
             console.error("Error getting recommendations:", error);
-            resultsArea.classList.remove('results-area-loading'); // Remove loading class on error too
+            resultsArea.classList.remove('results-area-loading');
+            // The initial-prompt-message is already hidden. Now we overwrite innerHTML.
             resultsArea.innerHTML = `<p style="color: red;">Sorry, an error occurred: ${error.message}</p>`;
-            updateProgress(`Error: ${error.message}`); // This will be inside the fixed height box
+            // updateProgress(`Error: ${error.message}`); // This would add to the ul, might be confusing with fixed error msg
             retrySection.classList.remove('hidden');
         } finally {
             isAgentRunning = false;
-            // Buttons and select remain disabled until retry is clicked
         }
     }
 
@@ -130,7 +134,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (retryButton) {
         retryButton.addEventListener('click', () => {
             console.log("Retry button clicked.");
-            resetUIForNewSearch(); // This already removes the loading class
+            resetUIForNewSearch();
         });
     }
+
+    // Ensure initial state is correct
+    if(initialPromptMessage) initialPromptMessage.style.display = 'block';
 });

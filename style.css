@@ -16,7 +16,7 @@
 
   /* neutrals */
   --clr-surface-light: #F4F6F8;
-  --clr-surface-dark:  #0D1826;
+  --clr-surface-dark:  #223c5e;
   --clr-text:          #1D1D1D;   /* on light */
   --clr-text-invert:   #FFFFFF;   /* on dark */
 }
@@ -33,18 +33,22 @@ body {
 h1, h2 {
   font-family: var(--font-condensed);
   letter-spacing: 0.5px;
-  color: #333; /* Replaced var(--clr-text-light) */
+  color: var(--clr-accent);
   text-align: center;
 }
 
 /* Container for the main content */
 .container {
-  background-color: var(--clr-card-bg);
+  background-color: var(--clr-primary);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Replaced var(--shadow-container) */
   max-width: 600px;
   margin: auto;
+}
+
+p {
+  color:  var(--clr-surface-light);
 }
 
 /* Introductory paragraph */
@@ -55,6 +59,7 @@ p.intro {
 
 /* Form Labels */
 label {
+  color: var(--clr-surface-light);
   display: block;
   margin-top: 15px;
   margin-bottom: 5px;
@@ -72,21 +77,31 @@ select {
   font-family: var(--font-sans);
 }
 
+#city-select {
+  font-size: 1.1rem;
+}
+
+.intro {font-size: 1.3rem;}
+
 /* Timeframe Buttons Section */
 .timeframe-buttons {
   display: flex;
   justify-content: space-around;
   margin-bottom: 20px;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .timeframe-buttons button {
   padding: 10px 15px;
-  border-radius: 4px;
-  border: 1px solid #007bff; /* Replaced var(--clr-border-button-timeframe) */
+  border: none;
+  border-radius: 2px;
+  height: 90px;
   background-color: #e7f3ff; /* Replaced var(--bg-button-timeframe) */
   color: #0056b3; /* Replaced var(--clr-text-button-timeframe) */
   cursor: pointer;
-  font-size: 14px;
+  font-size: 1.9rem;
+  font-weight: 600;
   font-family: var(--font-sans);
   flex-grow: 1;
   margin: 0 5px;
@@ -107,16 +122,17 @@ select {
 /* Results Area Styles */
 #results-area {
   position: relative;
-  margin-top: 20px;
+  margin-top: 90px;
+  margin-bottom: 90px;
   padding: 15px;
-  background-color: var(--clr-results-bg);
   border-radius: 4px;
   min-height: 50px;
   transition: max-height 0.3s ease-out;
+  background-color: #f4f0f0;
 }
 
 #results-area.results-area-loading {
-  max-height: 100px;
+  max-height: 200px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -129,13 +145,15 @@ select {
 
 #results-area h2 { 
   margin-top: 0; 
-  text-align: left;
+  text-align: center;
   font-family: var(--font-condensed);
+  color: #101010;
 }
 
 #results-area p, 
 #results-area ul {
   text-align: left;
+  color: #000;
 }
 
 #results-area ul { 
@@ -162,13 +180,13 @@ select {
 #retry-section p {
   font-style: italic;
   margin-bottom: 10px;
-  color: #555; /* Replaced var(--clr-text-muted) */
+  color: #e7e4e4;
 }
 
 #retry-section button {
-  padding: 10px 20px;
+  padding: 10px 90px;
   font-size: 16px;
-  background-color: var(--clr-success); /* Kept as it's a main status color */
+  background-color: var(--clr-primary-tint); /* Kept as it's a main status color */
   color: #FFFFFF; /* Replaced var(--clr-text-button-primary) */
   border: none;
   border-radius: 4px;
@@ -178,25 +196,5 @@ select {
 }
 
 #retry-section button:hover {
-  background-color: var(--clr-success-hover); /* Kept as it's related to main status color */
-}
-
-/* Utility button styles */
-.btn-primary {
-  background: var(--clr-primary); /* Kept as it's a main theme color */
-  color: #FFFFFF; /* Replaced var(--clr-text-button-primary) */
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-family: var(--font-sans);
-}
-
-.badge-hot {
-  background: var(--clr-accent); /* Kept as it's a main theme color */
-  color: #1E1E1E; /* Replaced var(--clr-text) */
-  padding: 0.25em 0.5em;
-  border-radius: 4px;
-  font-size: 0.9em;
-  font-weight: bold;
+  background-color: #1628ef;
 }

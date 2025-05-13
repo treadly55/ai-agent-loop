@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekend Away - Event Finder</title>
+    <title>City Fun Finder</title>
     <link rel="stylesheet" href="/style.css"> 
+    <style>
+        /* All styles are assumed to be in styles.css as per previous steps */
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Weekend Away</h1>
+        <h1>City Fun Finder</h1>
         <p class="intro">Find exciting events happening in your chosen city!</p>
 
         <div>
@@ -30,12 +33,12 @@
         </div>
 
         <div id="results-area">
-            <p>Choose a city and timeframe above to find events.</p>
+            <p id="initial-prompt-message">Choose a city and timeframe above to find events.</p>
         </div>
 
         <div id="retry-section" class="hidden">
             <p>Didn't find any events you like?</p>
-            <button id="btn-retry">Try again</button>
+            <button id="btn-retry">Try a new state</button>
         </div>
     </div>
 
