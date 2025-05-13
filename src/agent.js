@@ -2,74 +2,84 @@
 import { openai } from './openaiClient.js';
 import { availableFunctions } from './tools.js';
 
-// System Prompt (should be the version that accepts 'city' as a parameter)
+// System Prompt Updated for single weatherDate and getWeather tool
 const systemPrompt = `
-You are "Weekend Away," an AI assistant. Your SOLE initial task is to fetch event data for a given city. Your ultimate goal is to recommend the 2 most exciting-sounding events from that data.
+You are "Weekend Away," an AI assistant. Your goal is to fetch event data and weather for a given city and timeframe key, then recommend the 2 most exciting-sounding events, incorporating weather insights.
 
 Your process MUST be followed rigidly:
 
 **Step 1: Fetch Event Data (MANDATORY FIRST ACTION)**
-* You will be given a 'city' name (e.g., "Sydney, New South Wales, Australia") and an 'eventKey' string.
+* You will be given a 'city' name (e.g., "Sydney, New South Wales, Australia"), an 'eventKey' string (e.g., "date:today"), and a specific 'weatherDate' (YYYY-MM-DD).
 * Your VERY FIRST action, without any other thought or preamble, MUST be to use the 'getEvents' tool.
-* You MUST use the provided 'city' for the 'city' argument and the exact 'eventKey' string provided to you for the 'eventKey' argument in the tool call.
+* You MUST use the provided 'city' for the 'city' argument and the exact 'eventKey' string for the 'eventKey' argument in the 'getEvents' tool call.
 * Output this action in the format: Action: getEvents: {"city": "THE_PROVIDED_CITY", "eventKey": "the_provided_event_key"}\nPAUSE
 
-**Step 2: Analyze Event Data (After Observation)**
-* Once you receive the 'Observation:' containing the list of events (which will include 'name', 'description', and 'link' fields for each event):
-    * Carefully read the 'name' and 'description' of each event.
-    * Identify the 2 events that sound the most exciting, fun, unique, or engaging based *only* on the text in their name and description.
+**Step 2: Fetch Weather Data (MANDATORY SECOND ACTION)**
+* After receiving the 'Observation:' with event data, your NEXT action MUST be to use the 'getWeather' tool.
+* You MUST use the provided 'city' for the 'city' argument and the provided 'weatherDate' for the 'date' argument in the 'getWeather' tool call.
+* Output this action in the format: Action: getWeather: {"city": "THE_PROVIDED_CITY", "date": "THE_PROVIDED_WEATHER_DATE"}\nPAUSE
 
-**Step 3: Format Final Output (After Analysis)**
+**Step 3: Analyze Event and Weather Data (After Both Observations)**
+* Once you receive the 'Observation:' containing the weather data:
+    * You now have both event data and weather data.
+    * Carefully read the 'name', 'description', and 'link' fields of each event.
+    * Consider the weather forecast (e.g., if it's sunny, rainy, warm, cold).
+    * Identify the 2 events that sound the most exciting, fun, unique, or engaging, AND are suitable for the predicted weather.
+
+**Step 4: Format Final Output (After Analysis)**
 * After selecting the top 2 events, provide your response containing ONLY the user-facing recommendation.
-* Do NOT include "Thought:", "Action:", "Observation:", or any other internal dialogue or conversational text in this final output.
+* Do NOT include "Thought:", "Action:", "Observation:", or any other internal dialogue in this final output.
 * Your entire final output message should consist ONLY of the following structure:
-    * An introductory sentence like "Based on the events for [City Name - just the city part], here are the two that sound most exciting!".
+    * An introductory sentence mentioning the city and a brief weather summary (e.g., "For [City Name], with [weather description, e.g., 'a sunny day'] expected on [weatherDate], here are two exciting event ideas:").
     * For each of the 2 recommended events, format it as follows:
         * Start with a bullet point (* or -).
-        * Include the event's name as a clickable link using HTML: <a href="EVENT_LINK_URL" target="_blank" rel="noopener noreferrer">EVENT_NAME</a>. Replace EVENT_LINK_URL with the actual 'link' value from the event data and EVENT_NAME with the event's 'name'. Use target="_blank" to open in a new tab.
+        * Include the event's name as a clickable link using HTML: <a href="EVENT_LINK_URL" target="_blank" rel="noopener noreferrer">EVENT_NAME</a>.
         * After the link, add a colon (:).
-        * Briefly state why it sounds exciting, quoting or paraphrasing the 'description'.
+        * Briefly state why it sounds exciting and how it fits the weather, quoting or paraphrasing the event 'description'.
 
-Available Tool:
+Available Tools:
 1.  **getEvents**:
     * Description: Finds events happening in the specified 'city' for the timeframe represented by the 'eventKey'.
     * Arguments: {"city": "THE_PROVIDED_CITY_STRING", "eventKey": "the_exact_event_key_string_provided_to_you"}
     * Returns: JSON string of event objects, where each object includes 'name', 'description', and 'link' fields.
+2.  **getWeather**:
+    * Description: Gets the weather forecast for the specified 'city' on the specified 'date'.
+    * Arguments: {"city": "THE_PROVIDED_CITY_STRING", "date": "YYYY-MM-DD_FORMATTED_DATE"}
+    * Returns: JSON string of a weather object (e.g., '{"date": "YYYY-MM-DD", "main": "Clear", "description": "clear sky", "temp_max": 25, "temp_min": 15}').
 
-Interaction Flow:
-1.  Thought: (Optional for first step) My only first step is to call getEvents with the provided city and eventKey.
-2.  Action: getEvents: {"city": "THE_PROVIDED_CITY", "eventKey": "provided_event_key"}\nPAUSE
-3.  PAUSE
-4.  Observation: (List of events from the tool)
-5.  Thought: Now I will analyze these events for [City Name] and pick the top 2 most exciting.
-6.  Final Output: (Formatted HTML recommendations for the specified city)
+Interaction Flow Example:
+1. User Query (internal): Provides city, eventKey, weatherDate.
+2. Thought: First, I must call getEvents.
+3. Action: getEvents: {"city": "Melbourne...", "eventKey": "date:today"}\nPAUSE
+4. PAUSE
+5. Observation: (List of events from getEvents tool)
+6. Thought: Now I must call getWeather for Melbourne on the provided weatherDate.
+7. Action: getWeather: {"city": "Melbourne...", "date": "2025-05-13"}\nPAUSE
+8. PAUSE
+9. Observation: (Weather data from getWeather tool)
+10. Thought: Now I will analyze events and weather to pick the top 2 most exciting and weather-appropriate.
+11. Final Output: (Formatted HTML recommendations for Melbourne, incorporating weather)
 
 Example of the ONLY valid format for your final response message:
-Based on the events for Melbourne, here are the two that sound most exciting!
-* <a href="http://example.com/secret-cinema" target="_blank" rel="noopener noreferrer">Secret Cinema Screening</a>: This sounds thrilling because the location and theme are a surprise, making it an 'Immersive cinema experience'!
-* <a href="http://example.com/flash-mob" target="_blank" rel="noopener noreferrer">Flash Mob Dance Performance</a>: Catch this for 'Unexpected and energetic dance routines popping up'!
+For Melbourne, with clear skies expected on 2025-05-13, here are two exciting event ideas:
+* <a href="http://example.com/kayak-race" target="_blank" rel="noopener noreferrer">Kayak Adventure Race</a>: Perfect for a clear day, this offers a 'fun and challenging race around the harbour'!
+* <a href="http://example.com/food-rally" target="_blank" rel="noopener noreferrer">Gourmet Food Truck Rally</a>: Enjoy unique dishes outdoors with 'Live music too!' under the sunny sky.
 `;
 // --- End Updated System Prompt ---
 
-export async function runWeekendAgent(city, eventApiKeyString, progressCallback) {
-    // *** ADD THESE DIAGNOSTIC LOGS ***
-    console.log('[AGENT.JS ENTRY] Received city:', city);
-    console.log('[AGENT.JS ENTRY] Received eventApiKeyString:', eventApiKeyString);
-    console.log('[AGENT.JS ENTRY] Received progressCallback type:', typeof progressCallback);
-    console.log('[AGENT.JS ENTRY] Received progressCallback value:', progressCallback);
-    // *** END DIAGNOSTIC LOGS ***
+// Updated function signature to accept city, eventApiKeyString, and weatherDate
+export async function runWeekendAgent(city, eventApiKeyString, weatherDate, progressCallback) {
 
-    // This is line 58 (approx) where the error occurs if progressCallback is not a function
-    progressCallback(`Initializing agent for ${city} with key: ${eventApiKeyString}`);
+    progressCallback(`Initializing agent for ${city} with event key: '${eventApiKeyString}' and weather date: '${weatherDate}'`);
     
-    const userQuery = `Fetch events for city '${city}' using event key '${eventApiKeyString}' and then recommend the top 2 most exciting ones. Follow the system prompt's formatting instructions precisely for the final output.`;
+    const userQuery = `Fetch events for city '${city}' using event key '${eventApiKeyString}'. Then, fetch the weather for '${city}' on '${weatherDate}'. Finally, recommend the top 2 most exciting events suitable for the weather. Follow the system prompt's formatting instructions precisely for the final output.`;
 
     const messages = [
         { role: "system", content: systemPrompt },
         { role: "user", content: userQuery }
     ];
 
-    const MAX_ITERATIONS = 3;
+    const MAX_ITERATIONS = 5; // 1. getEvents, 2. getWeather, 3. AI processes and responds.
     const actionRegex = /Action:\s*(\w+):\s*({.*?})/s;
 
     try {
@@ -103,10 +113,10 @@ export async function runWeekendAgent(city, eventApiKeyString, progressCallback)
                 const actionArgsRaw = actionMatch[2].trim();
                 let actionArgs;
 
-                if (actionName !== "getEvents") {
+                if (actionName !== "getEvents" && actionName !== "getWeather") {
                      console.warn(`Agent tried to call unexpected tool: ${actionName}`);
                      progressCallback(`Error: Agent tried to use an invalid tool '${actionName}'.`);
-                     messages.push({ role: "assistant", content: `Observation: Error - Invalid tool '${actionName}'. Only 'getEvents' is available.` });
+                     messages.push({ role: "assistant", content: `Observation: Error - Invalid tool '${actionName}'. Only 'getEvents' and 'getWeather' are available.` });
                      continue;
                 }
 
@@ -120,20 +130,36 @@ export async function runWeekendAgent(city, eventApiKeyString, progressCallback)
                     messages.push({ role: "assistant", content: `Observation: Error parsing the arguments JSON provided: '${actionArgsRaw}'. Please ensure arguments are valid JSON.` });
                     continue;
                 }
-                 if (!actionArgs.city || !actionArgs.eventKey) {
+                
+                // Validate arguments for each tool
+                if (actionName === "getEvents" && (!actionArgs.city || !actionArgs.eventKey)) {
                     console.error("Missing required arguments (city or eventKey) for getEvents:", actionArgs);
                     progressCallback("Error: Missing city or eventKey argument for getEvents tool.");
                     messages.push({ role: "assistant", content: "Observation: Error - Missing 'city' or 'eventKey' in arguments for getEvents." });
                     continue;
                 }
+                if (actionName === "getWeather" && (!actionArgs.city || !actionArgs.date)) {
+                    console.error("Missing required arguments (city or date) for getWeather:", actionArgs);
+                    progressCallback("Error: Missing city or date argument for getWeather tool.");
+                    messages.push({ role: "assistant", content: "Observation: Error - Missing 'city' or 'date' in arguments for getWeather." });
+                    continue;
+                }
                 
                 try {
                     console.log(`CONFIRMED: Executing tool function availableFunctions['${actionName}']`);
-                    const toolResult = await availableFunctions[actionName](
-                        actionArgs.city, 
-                        actionArgs.eventKey,
-                        actionArgs.categories
-                    );
+                    let toolResult;
+                    if (actionName === "getEvents") {
+                        toolResult = await availableFunctions[actionName](
+                            actionArgs.city, 
+                            actionArgs.eventKey,
+                            actionArgs.categories // Optional for getEvents
+                        );
+                    } else if (actionName === "getWeather") {
+                        toolResult = await availableFunctions[actionName](
+                            actionArgs.city,
+                            actionArgs.date // Specific date for getWeather
+                        );
+                    }
                     messages.push({ role: "assistant", content: `Observation: ${toolResult}` });
                     progressCallback(`Received observation from ${actionName}.`);
                     console.log(`Observation from ${actionName}:`, toolResult);
@@ -157,7 +183,6 @@ export async function runWeekendAgent(city, eventApiKeyString, progressCallback)
 
     } catch (error) {
         console.error("Error in agent loop:", error);
-        // Check if progressCallback is a function before calling it in the catch block
         if (typeof progressCallback === 'function') {
             progressCallback("An error occurred while processing your request.");
         } else {
