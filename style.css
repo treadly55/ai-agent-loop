@@ -1,0 +1,202 @@
+/* styles.css */
+
+:root {
+  /* --- Variables to KEEP in :root --- */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-condensed: 'Barlow Condensed', 'Inter', sans-serif;
+
+  /* brand */
+  --clr-primary:       #051221;
+  --clr-primary-tint:  #12314C;
+
+  /* accents */
+  --clr-accent:        #FFB514;
+  --clr-success:       #00C389;
+  --clr-warning:       #FF8C32;
+
+  /* neutrals */
+  --clr-surface-light: #F4F6F8;
+  --clr-surface-dark:  #0D1826;
+  --clr-text:          #1D1D1D;   /* on light */
+  --clr-text-invert:   #FFFFFF;   /* on dark */
+}
+
+/* General Body Styles */
+body {
+  font-family: var(--font-sans);
+  color: #1E1E1E; /* Replaced var(--clr-text) */
+  background-color: var(--clr-bg);
+  margin: 20px;
+}
+
+/* Headings */
+h1, h2 {
+  font-family: var(--font-condensed);
+  letter-spacing: 0.5px;
+  color: #333; /* Replaced var(--clr-text-light) */
+  text-align: center;
+}
+
+/* Container for the main content */
+.container {
+  background-color: var(--clr-card-bg);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Replaced var(--shadow-container) */
+  max-width: 600px;
+  margin: auto;
+}
+
+/* Introductory paragraph */
+p.intro {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Form Labels */
+label {
+  display: block;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+/* Select Dropdown */
+select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  border: 1px solid #ddd; /* Replaced var(--clr-border) */
+  box-sizing: border-box;
+  font-family: var(--font-sans);
+}
+
+/* Timeframe Buttons Section */
+.timeframe-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.timeframe-buttons button {
+  padding: 10px 15px;
+  border-radius: 4px;
+  border: 1px solid #007bff; /* Replaced var(--clr-border-button-timeframe) */
+  background-color: #e7f3ff; /* Replaced var(--bg-button-timeframe) */
+  color: #0056b3; /* Replaced var(--clr-text-button-timeframe) */
+  cursor: pointer;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  flex-grow: 1;
+  margin: 0 5px;
+  transition: background-color 0.2s ease;
+}
+
+.timeframe-buttons button:hover {
+  background-color: #cce5ff; /* Replaced var(--bg-button-timeframe-hover) */
+}
+
+.timeframe-buttons button:disabled {
+  background-color: #ddd; /* Replaced var(--bg-button-disabled) */
+  color: #888; /* Replaced var(--text-button-disabled) */
+  border-color: #ccc; /* Replaced var(--clr-border-button-disabled) */
+  cursor: not-allowed;
+}
+
+/* Results Area Styles */
+#results-area {
+  position: relative;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: var(--clr-results-bg);
+  border-radius: 4px;
+  min-height: 50px;
+  transition: max-height 0.3s ease-out;
+}
+
+#results-area.results-area-loading {
+  max-height: 100px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+#results-area.results-area-loading ul {
+  list-style-position: inside;
+}
+
+#results-area h2 { 
+  margin-top: 0; 
+  text-align: left;
+  font-family: var(--font-condensed);
+}
+
+#results-area p, 
+#results-area ul {
+  text-align: left;
+}
+
+#results-area ul { 
+  padding-left: 0px; 
+  margin-bottom: 0; 
+} 
+
+#results-area li { 
+  margin-bottom: 5px; 
+}
+
+/* Retry Section Styles */
+.hidden {
+  display: none;
+}
+
+#retry-section {
+  margin-top: 25px;
+  padding-top: 15px;
+  border-top: 1px solid #ddd; /* Replaced var(--clr-border) */
+  text-align: center;
+}
+
+#retry-section p {
+  font-style: italic;
+  margin-bottom: 10px;
+  color: #555; /* Replaced var(--clr-text-muted) */
+}
+
+#retry-section button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: var(--clr-success); /* Kept as it's a main status color */
+  color: #FFFFFF; /* Replaced var(--clr-text-button-primary) */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: background-color 0.2s ease;
+}
+
+#retry-section button:hover {
+  background-color: var(--clr-success-hover); /* Kept as it's related to main status color */
+}
+
+/* Utility button styles */
+.btn-primary {
+  background: var(--clr-primary); /* Kept as it's a main theme color */
+  color: #FFFFFF; /* Replaced var(--clr-text-button-primary) */
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+
+.badge-hot {
+  background: var(--clr-accent); /* Kept as it's a main theme color */
+  color: #1E1E1E; /* Replaced var(--clr-text) */
+  padding: 0.25em 0.5em;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-weight: bold;
+}

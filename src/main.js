@@ -1,4 +1,6 @@
 // src/main.js
+
+import '/style.css'; 
 import { runWeekendAgent } from './agent.js';
 
 const EVENT_API_KEY_FOR_TODAY = "date:today";
