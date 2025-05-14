@@ -19,6 +19,7 @@
   --clr-surface-dark:  #223c5e;
   --clr-text:          #1D1D1D;   /* on light */
   --clr-text-invert:   #FFFFFF;   /* on dark */
+   --font-terminal: 'Courier New', Courier, monospace;
 }
 
 /* General Body Styles */
@@ -35,6 +36,10 @@ h1, h2 {
   letter-spacing: 0.5px;
   color: var(--clr-accent);
   text-align: center;
+}
+
+h1 {
+  font-size: 4rem;
 }
 
 /* Container for the main content */
@@ -129,7 +134,17 @@ select {
   min-height: 50px;
   transition: max-height 0.3s ease-out;
   background-color: #f4f0f0;
+  display: none;
 }
+
+/* Styles for when search is in progress - green terminal font */
+#results-area.results-in-progress p,
+#results-area.results-in-progress ul,
+#results-area.results-in-progress li {
+color: var(--clr-success);
+font-family: var(--font-terminal);
+}
+/* The h2 for results will appear after progress, so it retains its original style. */
 
 #results-area.results-area-loading {
   max-height: 200px;
