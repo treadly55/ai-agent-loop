@@ -132,7 +132,7 @@ select {
   padding: 15px;
   border-radius: 4px;
   min-height: 50px;
-  transition: max-height 0.3s ease-out;
+  transition: height 0.3s ease-out;
   background-color: #f4f0f0;
   display: none;
 }
@@ -147,15 +147,19 @@ font-family: var(--font-terminal);
 /* The h2 for results will appear after progress, so it retains its original style. */
 
 #results-area.results-area-loading {
-  max-height: 200px;
-  overflow: hidden;
+  height: 200px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  background-color: black;
+  overflow: hidden;
 }
 
 #results-area.results-area-loading ul {
   list-style-position: inside;
+  margin-bottom: 0;
+  padding-left: 0px;
+  margin-top: auto;
 }
 
 #results-area h2 { 
