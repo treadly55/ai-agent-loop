@@ -19,18 +19,33 @@ export async function getEvents(city, eventApiKeyString, categories = []) {
 
     try {
         const response = await fetch(functionUrl, requestOptions);
+
+        if (!response.ok) {
+            let errorDetails = `Events function request failed with status ${response.status} (${response.statusText})`;
+            try {
+                const textResponse = await response.text();
+                errorDetails += ` - Server response: ${textResponse}`;
+            } catch (textError) {
+                // Failed to get text response, stick with status
+            }
+            console.error("[Tool Error from get-events Function]", errorDetails);
+            throw new Error(errorDetails);
+        }
+
         const data = await response.json();
 
-        if (!response.ok || data.error) {
-            const errorMessage = data.error || `Events function request failed with status ${response.status}`;
+        if (data.error) { // Check for application-level errors if JSON parsing was successful
+            const errorMessage = data.error;
             console.error("[Tool Error from get-events Function]", errorMessage);
             throw new Error(errorMessage);
         }
         return JSON.stringify(data);
 
     } catch (error) {
-        console.error(`[Tool Error] Failed to fetch events via Netlify Function: ${error.message}`);
-        return JSON.stringify({ error: `Failed to get events via proxy: ${error.message}` });
+        const finalErrorMessage = error.message || "Failed to get events via proxy";
+        console.error(`[Tool Error] Failed to fetch events via Netlify Function: ${finalErrorMessage}`);
+        // Return a stringified JSON object with the error message
+        return JSON.stringify({ error: `Failed to get events via proxy: ${finalErrorMessage}` });
     }
 }
 
@@ -54,18 +69,33 @@ export async function getWeather(cityFullName, date) {
 
     try {
         const response = await fetch(functionUrl, requestOptions);
+
+        if (!response.ok) {
+            let errorDetails = `Weather function request failed with status ${response.status} (${response.statusText})`;
+            try {
+                const textResponse = await response.text();
+                errorDetails += ` - Server response: ${textResponse}`;
+            } catch (textError) {
+                // Failed to get text response, stick with status
+            }
+            console.error("[Tool Error from get-weather Function]", errorDetails);
+            throw new Error(errorDetails);
+        }
+
         const data = await response.json();
 
-        if (!response.ok || data.error) {
-            const errorMessage = data.error || `Weather function request failed with status ${response.status}`;
+        if (data.error) { // Check for application-level errors if JSON parsing was successful
+            const errorMessage = data.error;
             console.error("[Tool Error from get-weather Function]", errorMessage);
             throw new Error(errorMessage);
         }
         return JSON.stringify(data);
 
     } catch (error) {
-        console.error(`[Tool Error] Failed to fetch weather via Netlify Function: ${error.message}`);
-        return JSON.stringify({ error: `Failed to get weather via proxy: ${error.message}` });
+        const finalErrorMessage = error.message || "Failed to get weather via proxy";
+        console.error(`[Tool Error] Failed to fetch weather via Netlify Function: ${finalErrorMessage}`);
+        // Return a stringified JSON object with the error message
+        return JSON.stringify({ error: `Failed to get weather via proxy: ${finalErrorMessage}` });
     }
 }
 
