@@ -1,9 +1,6 @@
-// netlify/functions/get-weather.js
-
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
-// Using the 5-day/3-hour forecast endpoint, which is generally available on free tiers
 const OPENWEATHER_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
 
 // Hardcoded coordinates for our supported cities
@@ -16,7 +13,7 @@ const cityCoordinates = {
 };
 
 exports.handler = async (event, context) => {
-    const { cityFullName, date: targetDateStr } = event.queryStringParameters; // date is YYYY-MM-DD
+    const { cityFullName, date: targetDateStr } = event.queryStringParameters;
 
     if (!cityFullName || !targetDateStr) {
         return { statusCode: 400, body: JSON.stringify({ error: "Missing 'cityFullName' or 'date' query parameter." }) };
@@ -33,10 +30,8 @@ exports.handler = async (event, context) => {
     }
 
     const { lat, lon, displayName } = coordinates;
-    console.log(`[Weather Fn] Using hardcoded Lat/Lon for ${displayName}: Lat ${lat}, Lon ${lon}`);
 
     try {
-        // Get 5-day/3-hour Weather forecast using Lat/Lon
         const weatherParams = new URLSearchParams({
             lat: lat,
             lon: lon,
@@ -44,7 +39,6 @@ exports.handler = async (event, context) => {
             units: 'metric',
         });
         const weatherUrl = `${OPENWEATHER_FORECAST_URL}?${weatherParams.toString()}`;
-        console.log(`[Weather Fn] Requesting Weather URL (5-day): ${weatherUrl}`);
         const weatherResponse = await fetch(weatherUrl);
         const weatherData = await weatherResponse.json();
 
@@ -53,7 +47,6 @@ exports.handler = async (event, context) => {
             return { statusCode: 502, body: JSON.stringify({ error: `Failed to fetch weather data: ${weatherData.message || 'Unknown error'}` }) };
         }
 
-        // Find relevant forecast entries for the targetDateStr from the list
         let relevantForecastsForDay = [];
         for (const forecast of weatherData.list) {
             if (forecast.dt_txt.startsWith(targetDateStr)) {
@@ -76,20 +69,19 @@ exports.handler = async (event, context) => {
             return { statusCode: 404, body: JSON.stringify({ error: `No weather forecast entries found for ${targetDateStr} in ${displayName}.` }) };
         }
 
-        // Select a representative forecast (e.g., midday or the first one)
         let representativeForecast = relevantForecastsForDay.find(f => f.time === "12:00:00" || f.time === "15:00:00") || relevantForecastsForDay[0];
         
         let dayMinTemp = representativeForecast.temp_min;
         let dayMaxTemp = representativeForecast.temp_max;
         if(relevantForecastsForDay.length > 1) {
-            dayMinTemp = Math.min(...relevantForecastsForDay.map(f => f.temp_min ?? f.temp)); // Use nullish coalescing for temp_min
-            dayMaxTemp = Math.max(...relevantForecastsForDay.map(f => f.temp_max ?? f.temp)); // Use nullish coalescing for temp_max
+            dayMinTemp = Math.min(...relevantForecastsForDay.map(f => f.temp_min ?? f.temp));
+            dayMaxTemp = Math.max(...relevantForecastsForDay.map(f => f.temp_max ?? f.temp));
         }
 
 
         const finalForecast = {
             date: targetDateStr,
-            city: displayName, // Add city name to the response
+            city: displayName,
             main: representativeForecast.main,
             description: representativeForecast.description,
             temp_max: parseFloat(dayMaxTemp.toFixed(1)),
@@ -97,7 +89,6 @@ exports.handler = async (event, context) => {
             icon: representativeForecast.icon,
         };
 
-        console.log(`[Weather Fn] Representative forecast for ${targetDateStr} in ${displayName}:`, finalForecast);
         return { statusCode: 200, body: JSON.stringify(finalForecast) };
 
     } catch (error) {

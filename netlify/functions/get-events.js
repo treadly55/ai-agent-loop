@@ -1,9 +1,6 @@
-// netlify/functions/get-events.js
-
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const SERPAPI_API_KEY = process.env.SERPAPI_API_KEY;
-// WEATHER_API_KEY is no longer needed here as we removed geocoding
 const SERPAPI_BASE_URL = "https://serpapi.com/search.json";
 
 // Mapping for city names to the format SerpApi might prefer for its 'location' parameter
@@ -16,7 +13,7 @@ const cityLocationMapping = {
 };
 
 exports.handler = async (event, context) => {
-    const { eventApiKeyString, city } = event.queryStringParameters; // city is "City, AU" from frontend
+    const { eventApiKeyString, city } = event.queryStringParameters;
 
     if (!eventApiKeyString || !city) {
         return { statusCode: 400, body: JSON.stringify({ error: "Missing 'eventApiKeyString' or 'city' query parameter." }) };
@@ -26,26 +23,22 @@ exports.handler = async (event, context) => {
         return { statusCode: 500, body: JSON.stringify({ error: "Server configuration error: SerpApi Key missing." }) };
     }
 
-    // Use the mapped location string for SerpApi, or fallback to the provided city string if not in map
     const locationForSerpApi = cityLocationMapping[city] || city;
-    console.log(`[GetEvents Fn] Using location string for SerpApi: '${locationForSerpApi}' (original input: '${city}')`);
 
     const params = new URLSearchParams();
     params.append('engine', 'google_events');
     params.append('q', 'events');
-    params.append('location', locationForSerpApi); // Use the mapped or original city string
+    params.append('location', locationForSerpApi);
     params.append('gl', 'au');
     params.append('hl', 'en');
     params.append('htichips', eventApiKeyString);
     params.append('api_key', SERPAPI_API_KEY);
 
     const requestUrl = `${SERPAPI_BASE_URL}?${params.toString()}`;
-    console.log(`[GetEvents Fn] Requesting SerpApi URL with location string: ${requestUrl}`);
 
     try {
         const response = await fetch(requestUrl);
         const data = await response.json();
-        console.log(`[GetEvents Fn] SerpApi Response Status: ${response.status}`);
 
         if (data.error) {
             console.error("[GetEvents Fn] Error from SerpApi:", data.error);
@@ -65,7 +58,6 @@ exports.handler = async (event, context) => {
             category: event.knowledge_graph?.type || "Event",
             link: event.link || event.event_location_map?.link || null
         }));
-        console.log(`[GetEvents Fn] Processed ${processedEvents.length} events for ${locationForSerpApi}`);
         return { statusCode: 200, body: JSON.stringify(processedEvents) };
 
     } catch (error) {
